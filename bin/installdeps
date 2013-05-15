@@ -5,7 +5,7 @@ use warnings;
 
 # PODNAME: installdeps
 # ABSTRACT: A tiny script to install dependent modules
-our $VERSION = 'v0.0.1'; # VERSION
+our $VERSION = 'v0.0.2'; # VERSION
 
 use App::installdeps;
 
@@ -21,7 +21,7 @@ installdeps - A tiny script to install dependent modules
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: A tiny script to install dependent modules
-our $VERSION = 'v0.0.1'; # VERSION
+our $VERSION = 'v0.0.2'; # VERSION
 
 use Getopt::Std;
 use Pod::Usage;
@@ -18,7 +18,7 @@ sub _process
 
 	my %opts;
 	getopts('hi:nx:ru', \%opts);
-	pod2usage(-verbosity => 2) if exists $opts{h};
+	pod2usage(-verbose => 2) if exists $opts{h};
 	pod2usage(-msg => 'At least one argument MUST be specified', -verbose => 0, -exitval => 1) if ! @ARGV;
 	$opts{i} ||= 'cpanm';
 
@@ -47,7 +47,7 @@ sub run
 		print join(' ', @$target), "\n";
 	} else {
 		print $opts->{i},' ',join(' ', @$target), "\n";
-#		system $opts->{i},@$target;
+		system $opts->{i},@$target;
 	}
 }
 
@@ -63,7 +63,7 @@ App::installdeps - A tiny script to install dependent modules
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 SYNOPSIS
 

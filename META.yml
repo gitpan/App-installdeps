@@ -17,4 +17,4 @@ name: App-installdeps
 requires:
   Module::ExtractUse: 0.30
   perl: 5.006
-version: v0.0.1
+version: v0.0.2
