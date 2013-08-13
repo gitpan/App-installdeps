@@ -5,7 +5,7 @@ use warnings;
 
 # PODNAME: installdeps
 # ABSTRACT: A tiny script to install dependent modules
-our $VERSION = 'v0.0.2'; # VERSION
+our $VERSION = 'v0.0.3'; # VERSION
 
 use App::installdeps;
 
@@ -21,13 +21,13 @@ installdeps - A tiny script to install dependent modules
 
 =head1 VERSION
 
-version v0.0.2
+version v0.0.3
 
 =head1 SYNOPSIS
 
 installdeps C<-h>
 
-installdeps [C<-n>] [C<-i E<lt>commandE<gt>>] [C<-x E<lt>regexE<gt>>] [C<-r>] [C<-u>] C<E<lt>files_or_dirsE<gt>>...
+installdeps [C<-n>] [C<-i E<lt>commandE<gt>>] [C<-x E<lt>regexE<gt>>] [C<-r>] [C<-u>] [C<-R>] C<E<lt>files_or_dirsE<gt>>...
 
   # show POD help
   installdeps -h
@@ -43,9 +43,10 @@ installdeps [C<-n>] [C<-i E<lt>commandE<gt>>] [C<-x E<lt>regexE<gt>>] [C<-r>] [C
   installdeps -i 'cpanm -f' *.pl
 
   # can specify directories
-  # exclude optional modules (-r) and include installed modules (-u)
+  # exclude optional modules (-r), include installed modules (-u),
+  # recursive check (-R) and disable default exclusion filter (-X)
   # additionally, exclude Acme::*. NOTE that // is not necessary.
-  installdeps -ru -x ^Acme:: lib t
+  installdeps -ruRX -x ^Acme:: lib t
 
 =head1 DESCRIPTION
 
@@ -74,7 +75,7 @@ Specify install command. Defaults to C<cpanm>.
 
 =item C<-x E<lt>regexE<gt>>
 
-Specify regex for exclusion. If module names match to this regex, they are excluded from install targets.
+Specify regex for exclusion. If module names match to this regex, they are excluded from install targets. Recursive check by C<-R> is not done for excluded modules, either.
 
 =item C<-r>
 
@@ -84,7 +85,31 @@ Exclude optional modules, which are used in eval context.
 
 Include modules installed already.
 
+=item C<-R>
+
+Recursive dependency check for existing modules.
+
+=item C<-X>
+
+Disable default exclusion filter /\$/. To specify C<-x> does NOT imply this option.
+
 =back
+
+=for getopt 'h'
+
+=for getopt 'n'
+
+=for getopt 'i:'
+
+=for getopt 'x:'
+
+=for getopt 'r'
+
+=for getopt 'u'
+
+=for getopt 'R'
+
+=for getopt 'X'
 
 =head1 AUTHOR
 

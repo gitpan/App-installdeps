@@ -11,10 +11,7 @@ use ExtUtils::MakeMaker 6.30;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "A tiny script to install dependent modules",
   "AUTHOR" => "Yasutaka ATARASHI <yakex\@cpan.org>",
-  "BUILD_REQUIRES" => {
-    "Test::Exception" => 0,
-    "Test::More" => 0
-  },
+  "BUILD_REQUIRES" => {},
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.30"
   },
@@ -25,14 +22,33 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "App::installdeps",
   "PREREQ_PM" => {
-    "Module::ExtractUse" => "0.30"
+    "Getopt::Config::FromPod" => 0,
+    "Module::ExtractUse" => "0.30",
+    "version" => "0.77"
   },
-  "VERSION" => "v0.0.2",
+  "TEST_REQUIRES" => {
+    "Test::Exception" => 0,
+    "Test::More" => 0
+  },
+  "VERSION" => "v0.0.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
+  my $tr = delete $WriteMakefileArgs{TEST_REQUIRES};
+  my $br = $WriteMakefileArgs{BUILD_REQUIRES};
+  for my $mod ( keys %$tr ) {
+    if ( exists $br->{$mod} ) {
+      $br->{$mod} = $tr->{$mod} if $tr->{$mod} > $br->{$mod};
+    }
+    else {
+      $br->{$mod} = $tr->{$mod};
+    }
+  }
+}
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
   my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};

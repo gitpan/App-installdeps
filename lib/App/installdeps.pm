@@ -4,20 +4,36 @@ use strict;
 use warnings;
 
 # ABSTRACT: A tiny script to install dependent modules
-our $VERSION = 'v0.0.2'; # VERSION
+our $VERSION = 'v0.0.3'; # VERSION
 
 use Getopt::Std;
+use Getopt::Config::FromPod;
 use Pod::Usage;
 
 use Module::ExtractUse;
 use File::Find;
+use version 0.77;
+
+sub _exists
+{
+	my $module = shift;
+	unless($module =~ /\.pm$/) {
+		$module =~ s@::@/@g;
+		$module .= '.pm';
+	}
+	for my $prefix (@INC) {
+		my $path = "$prefix/$module";
+		return $path if -e $path;
+	}
+	return;
+}
 
 sub _process
 {
 	local (@ARGV) = @_;
 
 	my %opts;
-	getopts('hi:nx:ru', \%opts);
+	getopts(Getopt::Config::FromPod->string, \%opts);
 	pod2usage(-verbose => 2) if exists $opts{h};
 	pod2usage(-msg => 'At least one argument MUST be specified', -verbose => 0, -exitval => 1) if ! @ARGV;
 	$opts{i} ||= 'cpanm';
@@ -34,7 +50,25 @@ sub _process
 			warn "can't recognize argument: $arg";
 		}
 	}
-	my (@target) = grep { ! exists $opts{x} || $_ !~ /$opts{x}/ } grep { exists $opts{u} || ! eval "require $_"; } keys %{exists $opts{r} ? $p->used_out_of_eval : $p->used};
+	my @target;
+	my %checked;
+	my @candidate = keys %{exists $opts{r} ? $p->used_out_of_eval || {}: $p->used || {}};
+	while(my $candidate = shift @candidate) {
+		next if version::is_lax($candidate);
+		my $path;
+		$path = _exists($candidate) if ! exists $opts{u} || exists $opts{R};
+		next if exists $opts{x} && $candidate =~ /$opts{x}/;
+		next if ! exists $opts{X} && $candidate =~ /\$/;
+		next if exists $checked{$candidate};
+		$checked{$candidate} = 1;
+		if(defined $path && exists $opts{R}) {
+			my $pp = Module::ExtractUse->new;
+			$pp->extract_use($path);
+			push @candidate, grep { ! exists $checked{$_} } keys %{exists $opts{r} ? $pp->used_out_of_eval || {} : $pp->used || {}};
+		}
+		next if ! exists $opts{u} && defined $path;
+		push @target, $candidate;
+	}
 	return (\%opts, \@target);
 }
 
@@ -63,7 +97,7 @@ App::installdeps - A tiny script to install dependent modules
 
 =head1 VERSION
 
-version v0.0.2
+version v0.0.3
 
 =head1 SYNOPSIS
 
